@@ -1,5 +1,34 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <title>...</title>
     <script type="text/javascript" src="db.js"></script>
   </head>
+  <body>
+    <pre>
+      db ('foo', {
+        version : '1.0'  ,
+        desc    : '...' ,
+        size    : 200000,
+        tables  : {
+          foo : _split_co ('x TEXT, y INTEGER'),
+          bar : ['z TEXT']
+        }
+      });
+
+      db ('foo', none, function () { return [
+        DB.foo.iFoo ([
+          { x: 'foo', y: 99 },
+        ]),
+      ]; });
+
+      db ('foo', none, function () { return [
+        DB.foo.qFoo (function (i, x) {
+          console.log ('#' + i); console.log (x);
+        }),
+      ]; });
+
+      // ...
+    </pre>
+  </body>
 </html>

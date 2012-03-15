@@ -16,6 +16,11 @@ var DB    = {};
 
 //  --
 
+function _split_ws (s) { return s.trim ().split (/\s+/    ); }
+function _split_co (s) { return s.trim ().split (/\s*,\s*/); }
+
+//  --
+
 //
 //  Usage: db_error_cb (e) -> none
 //
@@ -33,7 +38,7 @@ function db_error_cb (e) {                                    //  {{{1
 function db_with (name) {                                     //  {{{1
   return function (f, f_success, f_error) {
     var db = window.openDatabase (
-      name, DB[name].version, DB[name].d_name, DB[name].size
+      name, DB[name].version, DB[name].desc, DB[name].size
     );
     db.transaction (f, f_error, f_success);
   }
@@ -65,49 +70,49 @@ function db_seq (name) {                                      //  {{{1
 //
 
 function db_defns (name) {                                    //  {{{1
-  var tables = DB[name].tables;
+  var d = DB[name];
 
-  for (var i in tables) {
-    var t = tables[i];
-    var T = t[0].toUpperCase () + t.substr (1);
+  for (var t_ in d.tables) {
+    (function (t) {
+      var T = t[0].toUpperCase () + t.substr (1);
 
-    var f_q = function (f, f_error, w, v) {
-      return db_query (
-        DB[name].table, DB[name].fields], f, f_error, w, v
-      );
-    };
-    var f_i = function (records) {
-      return db_insert (DB[name].table, DB[name].fields], records);
-    };
-    var f_u = function (records) {
-      return db_update (DB[name].table, DB[name].fields], records);
-    };
+      DB[name]['q' + T] = function (f, f_error, w, v) {
+        return db_query (t, d.fields[t], f, f_error, w, v);
+      };
 
-    DB[name]['q' + T] = f_q;
-    DB[name]['i' + T] = f_i;
-    DB[name]['u' + T] = f_u;
+      DB[name]['i' + T] = function (records) {
+        return db_insert (t, d.fields[t], records);
+      };
+
+      DB[name]['u' + T] = function (records) {
+        return db_update (t, d.fields[t], records);
+      };
+    })(t_);
   }
 }                                                             //  }}}1
 
 
 //
-//  Usage: db (name, version, d_name, size, tables[, f]) -> none
+//  Usage: db (name, def[, f]) -> none
 //
 //  Example:
 //    db (
-//      'Foo Bar Baz', '1.0', '...', 200000, {
-//        tbl_foo: [
-//          'foo TEXT'    , // ...
-//          'bar INTEGER' , // ...
-//        ], ...
-//      }, function () { return [
+//      'foo', { version: '1.0', desc: '...', size: 200000, tables: {
+//        foo: [
+//          'x TEXT'    , // ...
+//          'y INTEGER' , // ...
+//        ],
+//        bar: _split_co ('z TEXT, zz INTEGER'),
+//        ...
+//      } },
+//      function () { return [
 //        function (tx) { ... },
 //        function (tx) { ... },
 //      ]; }
 //    );
 //
 
-function db (name, version, d_name, size, tables, f) {        //  {{{1
+function db (name, def, f) {                                  //  {{{1
   var f_ = f == none ? function () { return []; } : f;
 
   if (DB[name] != none) {
@@ -118,17 +123,17 @@ function db (name, version, d_name, size, tables, f) {        //  {{{1
 
   DB[name] = {
     name:     name          ,
-    version:  version       ,
-    d_name:   d_name        ,
-    size:     size          ,
-    tables:   tables        ,
+    version:  def.version   ,
+    desc:     def.desc      ,
+    size:     def.size      ,
+    tables:   def.tables    ,
     fields:   {}            ,
     seq:      db_seq (name) ,
   };
 
-  for (var k in tables) {
-    DB[name].fields[k] = tables[k].map (
-      function (x) { return x.split (/\s+/)[0]; }
+  for (var k in def.tables) {
+    DB[name].fields[k] = def.tables[k].map (
+      function (x) { return _split_ws (x)[0]; }
     );
   }
 
@@ -136,10 +141,10 @@ function db (name, version, d_name, size, tables, f) {        //  {{{1
 
   DB[name].seq (
     [ function (tx) {
-        for (var k in tables) {
-          sql = 'CREATE TABLE IF NOT EXISTS '
-              + k + ' (id INTEGER PRIMARY KEY, '
-              + tables[k].join (', ') + ' );';
+        for (var k in def.tables) {
+          var sql = 'CREATE TABLE IF NOT EXISTS '
+                  + k + ' (id INTEGER PRIMARY KEY, '
+                  + def.tables[k].join (', ') + ' );';
 
           if (DEBUG) { console.log (sql); }
 

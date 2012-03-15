@@ -143,7 +143,7 @@ function db (name, def, f) {                                  //  {{{1
     [ function (tx) {
         for (var k in def.tables) {
           var sql = 'CREATE TABLE IF NOT EXISTS '
-                  + k + ' (id INTEGER PRIMARY KEY, '
+                  + k + ' ( id INTEGER PRIMARY KEY, '
                   + def.tables[k].join (', ') + ' );';
 
           if (DEBUG) { console.log (sql); }

@@ -258,6 +258,7 @@ function db_update (table, fields, records, wk, vk) {         //  {{{1
 
       var r_vals  = fs.map (function (x) { return records[i][x]; });
       var w_vals  = records[i][vk_] || [];
+      var vals    = r_vals.concat (w_vals);
 
       var sql
         = 'UPDATE ' + table + ' SET '
@@ -266,10 +267,11 @@ function db_update (table, fields, records, wk, vk) {         //  {{{1
 
       if (DEBUG) {
         console.log (sql);
+        console.log (vals);
         console.log (records[i]);
       }
 
-      tx.executeSql (sql, r_vals.concat (w_vals));
+      tx.executeSql (sql, vals);
     }
   }
 }                                                             //  }}}1

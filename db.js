@@ -185,6 +185,8 @@ function db_query (table, fields, f, f_error, w, vs) {        //  {{{1
     }
 
     var g = function (tx, rs) {
+      if (DEBUG) { console.log (rs); }
+
       var len = rs.rows.length;
 
       for (var i = 0; i < len; ++i) {
@@ -198,19 +200,21 @@ function db_query (table, fields, f, f_error, w, vs) {        //  {{{1
 
 
 //
-//  Usage: db_insert (table, fields, records) -> none
+//  Usage: db_insert (table, fields, records[, f]) -> none
 //
 //  Example:
 //    db (..., function () { return [
 //      ...
 //      DB.foo.iFoo ([{ k1: v1, k2: v2}, ...]),
+//                                  // can also pass callback: f (ids)
 //      ...
 //    ]; });
 //
 
-function db_insert (table, fields, records) {                 //  {{{1
+function db_insert (table, fields, records, f) {              //  {{{1
   return function (tx) {
     var qms = fields.map (function (x) { return '?'; }).join (', ');
+    var ids = [];
 
     for (var i in records) {
       var sql = 'INSERT INTO ' + table
@@ -223,9 +227,16 @@ function db_insert (table, fields, records) {                 //  {{{1
       }
 
       tx.executeSql (
-        sql, fields.map (function (x) { return records[i][x]; })
+        sql, fields.map (function (x) { return records[i][x]; }),
+        function (tx, rs) {
+          if (DEBUG) { console.log (rs); }
+
+          ids.push (rs.insertID);
+        }
       );
     }
+
+    if (f != none) { f (ids); }
   }
 }                                                             //  }}}1
 

@@ -23,6 +23,12 @@
       ]; });
 
       db ('foo', none, function () { return [
+        DB.foo.uFoo ([
+          { y: -1, _W_: 'id =', _V_: [3] },
+        ]),
+      ]; });
+
+      db ('foo', none, function () { return [
         DB.foo.qFoo (function (i, x) {
           console.log ('#=' + i + ', id=' + x.id);
           console.log (x);

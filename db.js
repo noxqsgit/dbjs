@@ -177,7 +177,10 @@ function db_query (table, fields, f, f_error, w, vs) {        //  {{{1
             + ' FROM ' + table
             + (w == none ? '' : ' WHERE ' + w);
 
-    if (DEBUG) { console.log (sql); }
+    if (DEBUG) {
+      console.log (sql);
+      console.log (vs_);
+    }
 
     var g = function (tx, rs) {
       var len = rs.rows.length;

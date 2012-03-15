@@ -7,6 +7,8 @@
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2
 //
+//  TODO: delete !!!
+//
 //  --                                                          # }}}1
 
 var none  = undefined;
@@ -115,7 +117,7 @@ function db_defns (name) {                                    //  {{{1
 function db (name, def, f) {                                  //  {{{1
   var f_ = f == none ? function () { return []; } : f;
 
-  if (DB[name] != none) {
+  if (def == none) {
     DB[name].seq (f_ (), db_error_cb);
 
     return;                                                   //  !!!!

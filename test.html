@@ -24,8 +24,9 @@
 
       db ('foo', none, function () { return [
         DB.foo.qFoo (function (i, x) {
-          console.log ('#' + i); console.log (x);
-        }),
+          console.log ('#=' + i + ', id=' + x.id);
+          console.log (x);
+        }, none, 'id != ?', [2]),
       ]; });
 
       // ...

@@ -9,25 +9,40 @@ var dbDef   = {
   }
 };
 
-db (dbName, dbDef);
+db (dbName, dbDef, function () { return [
 
-db (dbName, none, function () { return [
+  // insert records
   DB[dbName].iFoo ([
-    { x: 'foo', y: 99 },
+    { x: 'foo', y: 37 },
+    { x: 'bar', y: 42 },
   ]),
-]; });
 
-db (dbName, none, function () { return [
+  // insert records w/ callback for insertion ids
+  DB[dbName].iFoo ([
+    { x: 'baz', y: 99 },
+  ], function (ids) { console.log (ids); }),
+
+
+  // update records
   DB[dbName].uFoo ([
-    { y: -1, _W_: 'id = ?', _V_: [3] },
+    { y: -1, _W_: db_eq ('id', 2) },
   ]),
-]; });
 
-db (dbName, none, function () { return [
+
+  // query records / callback; w/ filter
   DB[dbName].qFoo (function (i, x) {
     console.log ('#=' + i + ', id=' + x.id);
     console.log (x);
-  } /* , none, 'id != ?', [2] */ ),
-]; });
+  }, none, db_ne ('id', 1) ),
 
-// ...
+
+  // function (tx) { ... }, ...
+
+
+  // NB: you should probably set event handlers that use the database
+  // here, after the initialisation.
+
+  // NB: you can nest db calls w/out redefining:
+  // db (dbName, none, ...);
+
+]; });

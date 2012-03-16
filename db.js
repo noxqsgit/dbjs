@@ -2,7 +2,7 @@
 //
 //  File        : db.js
 //  Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-//  Date        : 2012-03-15
+//  Date        : 2012-03-16
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2
@@ -24,12 +24,50 @@ function _split_co (s) { return s.trim ().split (/\s*,\s*/); }
 //  --
 
 //
+//  :: db_cmp (o)(x, y) -> <...>
+//
+
+function db_cmp (o) {                                         //  {{{1
+  return function (x, y) {
+    return { expr: ' ' + x + ' ' + o + ' ? ', vals: [y] };
+  };
+}                                                             //  }}}1
+
+
+//
+//  :: db_cps (o)(x, y) -> <...>
+//
+
+function db_cps (o) {                                         //  {{{1
+  return function (x, y) {
+    return  { expr: ' (' + x.expr + ' ' + o + ' ' + y.expr + ') '
+            , vals: x.vals.concat (y.vals) };
+  };
+}                                                             //  }}}1
+
+//  --
+
+var db_eq   (x, y) = db_cmp ('==' );
+var db_ne   (x, y) = db_cmp ('!=' );
+
+var db_ge   (x, y) = db_cmp ('>=' );
+var db_gt   (x, y) = db_cmp ('>'  );
+
+var db_le   (x, y) = db_cmp ('<=' );
+var db_lt   (x, y) = db_cmp ('<'  );
+
+var db_and  (x, y) = db_cps ('AND');
+var db_or   (x, y) = db_cps ('OR' );
+
+//  --
+
+//
 //  :: db_error_cb (e) -> none
 //
 
-function db_error_cb (e) {                                    //  {{{1
+function db_error_cb (e) {
   console.log ("SQL Error: " + e.message);
-}                                                             //  }}}1
+}
 
 // --
 
@@ -43,7 +81,7 @@ function db_with (name) {                                     //  {{{1
       name, DB[name].version, DB[name].desc, DB[name].size
     );
     db.transaction (f, f_error, f_success);
-  }
+  };
 }                                                             //  }}}1
 
 
@@ -63,7 +101,7 @@ function db_seq (name) {                                      //  {{{1
     }
 
     return f ();
-  }
+  };
 }                                                             //  }}}1
 
 
@@ -196,7 +234,7 @@ function db_query (table, fields, f, f_error, w, vs) {        //  {{{1
     };
 
     tx.executeSql (sql, vs_, g, f_error);
-  }
+  };
 }                                                             //  }}}1
 
 
@@ -238,7 +276,7 @@ function db_insert (table, fields, records, f) {              //  {{{1
     }
 
     if (f != none) { f (ids); }
-  }
+  };
 }                                                             //  }}}1
 
 
@@ -287,7 +325,7 @@ function db_update (table, fields, records, wk, vk) {         //  {{{1
 
       tx.executeSql (sql, vals);
     }
-  }
+  };
 }                                                             //  }}}1
 
 //  --

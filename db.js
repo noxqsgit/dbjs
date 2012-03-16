@@ -21,7 +21,15 @@ var DB    = {};
 function _split_ws (s) { return s.trim ().split (/\s+/    ); }
 function _split_co (s) { return s.trim ().split (/\s*,\s*/); }
 
-//  --
+//  -- MOVE {
+
+function _die (s) { throw new Error (s); }
+
+function _chk_args (a, n, m) {
+  if (a.length < n || a.length > m) { _die ('wrong #args'); }
+}
+
+//  -- } MOVE
 
 //
 //  :: db_cmp (o)(x, y) -> <...>
@@ -35,14 +43,26 @@ function db_cmp (o) {                                         //  {{{1
 
 
 //
-//  :: db_cps (o)(x, y) -> <...>
+//  :: db_cps (o)(x, y, ...) -> <...>
 //
 
 function db_cps (o) {                                         //  {{{1
-  return function (x, y) {
-    return  { expr: ' (' + x.expr + ' ' + o + ' ' + y.expr + ') '
-            , vals: x.vals.concat (y.vals) };
+  var f = function (x, y) {
+    if (arguments.length < 2) {
+      _die ('too few args');                                  //  TODO
+    }
+    else if (arguments.length > 2) {
+      var rest = Array.prototype.slice.call (arguments, 1);   //  WTF!
+
+      return f (x, f.apply (null, rest));                     //  TODO
+    }
+    else {
+      return  { expr: ' (' + x.expr + o + y.expr + ') '
+              , vals: x.vals.concat (y.vals) };
+    }
   };
+
+  return f;
 }                                                             //  }}}1
 
 //  --
@@ -190,7 +210,7 @@ function db_query (table, fields, f, f_error, where) {        //  {{{1
   return function (tx) {
     var sql = 'SELECT id, ' + fields.join (', ')
             + ' FROM ' + table
-            + (where == none ? '' : ' WHERE ' + where.expr);
+            + (where == none ? '' : ' WHERE ' + where.expr.trim ());
 
     if (DEBUG) {
       console.log ('sql:', sql);
@@ -266,7 +286,7 @@ function db_update (table, fields, records, wk) {             //  {{{1
       var sql
         = 'UPDATE ' + table + ' SET '
         + fs.map (function (x) { return x + ' = ?' }).join (', ')
-        + ' WHERE ' + records[i][wk_].expr;
+        + ' WHERE ' + records[i][wk_].expr.trim ();
 
       if (DEBUG) {
         console.log ('sql:', sql);

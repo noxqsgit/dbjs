@@ -66,7 +66,7 @@ var db_or   = db_cps ('OR'  );
 //
 
 function db_error_cb (e) {
-  console.log ("SQL Error: " + e.message);
+  console.log ('SQL Error:', e.message);
 }
 
 // --
@@ -116,12 +116,12 @@ function db_defns (name) {                                    //  {{{1
     (function (t) {
       var T = t[0].toUpperCase () + t.substr (1);
 
-      DB[name]['q' + T] = function (f, f_error, w, v) {
-        return db_query (t, d.fields[t], f, f_error, w, v);
+      DB[name]['q' + T] = function (f, f_error, w) {
+        return db_query (t, d.fields[t], f, f_error, w);
       };
 
-      DB[name]['i' + T] = function (records) {
-        return db_insert (t, d.fields[t], records);
+      DB[name]['i' + T] = function (records, f) {
+        return db_insert (t, d.fields[t], records, f);
       };
 
       DB[name]['u' + T] = function (records) {
@@ -171,7 +171,7 @@ function db (name, def, f, f_error) {                         //  {{{1
                   + k + ' ( id INTEGER PRIMARY KEY, '
                   + def.tables[k].join (', ') + ' );';
 
-          if (DEBUG) { console.log (sql); }
+          if (DEBUG) { console.log ('sql:', sql); }
 
           tx.executeSql (sql);
         }
@@ -193,12 +193,12 @@ function db_query (table, fields, f, f_error, where) {        //  {{{1
             + (where == none ? '' : ' WHERE ' + where.expr);
 
     if (DEBUG) {
-      console.log (sql);
-      console.log (where.vals);
+      console.log ('sql:', sql);
+      console.log ('vls:', where.vals);
     }
 
     var g = function (tx, rs) {
-      if (DEBUG) { console.log (rs); }
+      if (DEBUG) { console.log ('res:', rs); }
 
       var len = rs.rows.length;
 
@@ -227,16 +227,16 @@ function db_insert (table, fields, records, f) {              //  {{{1
               + ' ) VALUES ( NULL, ' + qms + ' )';
 
       if (DEBUG) {
-        console.log (sql);
-        console.log (records[i]);
+        console.log ('sql:', sql);
+        console.log ('rec:', records[i]);
       }
 
       tx.executeSql (
         sql, fields.map (function (x) { return records[i][x]; }),
         function (tx, rs) {
-          if (DEBUG) { console.log (rs); }
+          if (DEBUG) { console.log ('res:', rs); }
 
-          ids.push (rs.insertID);
+          ids.push (rs.insertId);
         }
       );
     }
@@ -269,9 +269,9 @@ function db_update (table, fields, records, wk) {             //  {{{1
         + ' WHERE ' + records[i][wk_].expr;
 
       if (DEBUG) {
-        console.log (sql);
-        console.log (vals);
-        console.log (records[i]);
+        console.log ('sql:', sql);
+        console.log ('vls:', vals);
+        console.log ('rec:', records[i]);
       }
 
       tx.executeSql (sql, vals);

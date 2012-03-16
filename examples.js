@@ -9,28 +9,28 @@ var dbDef   = {
   }
 };
 
-db (dbName, dbDef, function () { return [
+db (dbName, dbDef, function (dbo) { return [
 
   // insert records
-  DB[dbName].iFoo ([
+  dbo.iFoo ([
     { x: 'foo', y: 37 },
     { x: 'bar', y: 42 },
   ]),
 
   // insert records w/ callback for insertion ids
-  DB[dbName].iFoo ([
+  dbo.iFoo ([
     { x: 'baz', y: 99 },
   ], function (ids) { console.log ('ids=', ids); }),
 
 
   // update records
-  DB[dbName].uFoo ([
+  dbo.uFoo ([
     { y: -1, _W_: db_eq ('id', 2) },
   ]),
 
 
   // query records / callback; w/ filter
-  DB[dbName].qFoo (function (i, x) {
+  dbo.qFoo (function (i, x) {
     console.log ('#=' + i, 'id=' + x.id, 'obj=', x);
   }, none, db_and (db_ne ('id', 1), db_lt ('id', 7)) ),
 

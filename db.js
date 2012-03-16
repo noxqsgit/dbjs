@@ -135,22 +135,6 @@ function db_defns (name) {                                    //  {{{1
 //
 //  :: db (name, def[, f, f_error]) -> none
 //
-//  Example:
-//    db (
-//      'foo', { version: '1.0', desc: '...', size: 200000, tables: {
-//        foo: [
-//          'x TEXT'    , // ...
-//          'y INTEGER' , // ...
-//        ],
-//        bar: _split_co ('z TEXT, zz INTEGER'),
-//        ...
-//      } },
-//      function () { return [
-//        function (tx) { ... },
-//        function (tx) { ... },
-//      ]; }
-//    );
-//
 
 function db (name, def, f, f_error) {                         //  {{{1
   var f_    = f       || function () { return []; };
@@ -199,28 +183,18 @@ function db (name, def, f, f_error) {                         //  {{{1
 // --
 
 //
-//  :: db_query (table, fields, f, f_error[, where, where_vals])
-//      -> none
-//
-//  Example:
-//    db (..., function () { return [
-//      ...
-//      DB.foo.qFoo (f, f_error),   // iterates: f (i, x)
-//      ...
-//    ]; });
+//  :: db_query (table, fields, f, f_error[, where]) -> none
 //
 
-function db_query (table, fields, f, f_error, w, vs) {        //  {{{1
-  var vs_ = vs == none ? [] : vs;
-
+function db_query (table, fields, f, f_error, where) {        //  {{{1
   return function (tx) {
     var sql = 'SELECT id, ' + fields.join (', ')
             + ' FROM ' + table
-            + (w == none ? '' : ' WHERE ' + w);
+            + (where == none ? '' : ' WHERE ' + where.expr);
 
     if (DEBUG) {
       console.log (sql);
-      console.log (vs_);
+      console.log (where.vals);
     }
 
     var g = function (tx, rs) {
@@ -233,21 +207,13 @@ function db_query (table, fields, f, f_error, w, vs) {        //  {{{1
       }
     };
 
-    tx.executeSql (sql, vs_, g, f_error);
+    tx.executeSql (sql, where.vals, g, f_error);
   };
 }                                                             //  }}}1
 
 
 //
 //  :: db_insert (table, fields, records[, f]) -> none
-//
-//  Example:
-//    db (..., function () { return [
-//      ...
-//      DB.foo.iFoo ([{ k1: v1, k2: v2}, ...]),
-//                                  // can also pass callback: f (ids)
-//      ...
-//    ]; });
 //
 
 function db_insert (table, fields, records, f) {              //  {{{1
@@ -281,26 +247,11 @@ function db_insert (table, fields, records, f) {              //  {{{1
 
 
 //
-//  :: db_update (table, fields, records[, where_key, where_vals_key])
-//      -> none
-//
-//  Example:
-//    db (..., function () { return [
-//      ...
-//      DB.foo.uFoo ([
-//      { k   : v,
-//        _W_ : 'x < ? AND y > ?',  // WHERE clause; use '?' !!!
-//        _V_ : [x, y]              // values for '?'s
-//      }, ...]),
-//      ...
-//    ]; });
-//
-//  TODO: WHERE ??? !!!
+//  :: db_update (table, fields, records[, where_key]) -> none
 //
 
-function db_update (table, fields, records, wk, vk) {         //  {{{1
+function db_update (table, fields, records, wk) {             //  {{{1
   wk_ = wk == none ? '_W_' : wk;
-  vk_ = vk == none ? '_V_' : vk;
 
   return function (tx) {
     for (var i in records) {
@@ -309,13 +260,13 @@ function db_update (table, fields, records, wk, vk) {         //  {{{1
       );
 
       var r_vals  = fs.map (function (x) { return records[i][x]; });
-      var w_vals  = records[i][vk_] || [];
+      var w_vals  = records[i][wk_].vals;
       var vals    = r_vals.concat (w_vals);
 
       var sql
         = 'UPDATE ' + table + ' SET '
         + fs.map (function (x) { return x + ' = ?' }).join (', ')
-        + ' WHERE ' + records[i][wk_];
+        + ' WHERE ' + records[i][wk_].expr;
 
       if (DEBUG) {
         console.log (sql);

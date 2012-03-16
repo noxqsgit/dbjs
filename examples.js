@@ -20,7 +20,7 @@ db (dbName, dbDef, function () { return [
   // insert records w/ callback for insertion ids
   DB[dbName].iFoo ([
     { x: 'baz', y: 99 },
-  ], function (ids) { console.log ('ids:', ids); }),
+  ], function (ids) { console.log ('ids=', ids); }),
 
 
   // update records
@@ -32,7 +32,7 @@ db (dbName, dbDef, function () { return [
   // query records / callback; w/ filter
   DB[dbName].qFoo (function (i, x) {
     console.log ('#=' + i, 'id=' + x.id, 'obj=', x);
-  }, none, db_ne ('id', 1) ),
+  }, none, db_and (db_ne ('id', 1), db_gt ('id', 7)) ),
 
 
   // function (tx) { ... }, ...

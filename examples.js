@@ -32,7 +32,7 @@ db (dbName, dbDef, function () { return [
   // query records / callback; w/ filter
   DB[dbName].qFoo (function (i, x) {
     console.log ('#=' + i, 'id=' + x.id, 'obj=', x);
-  }, none, db_and (db_ne ('id', 1), db_gt ('id', 7)) ),
+  }, none, db_and (db_ne ('id', 1), db_lt ('id', 7)) ),
 
 
   // function (tx) { ... }, ...

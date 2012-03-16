@@ -47,17 +47,17 @@ function db_cps (o) {                                         //  {{{1
 
 //  --
 
-var db_eq   (x, y) = db_cmp ('==' );
-var db_ne   (x, y) = db_cmp ('!=' );
+var db_eq   = db_cmp ('=='  );
+var db_ne   = db_cmp ('!='  );
 
-var db_ge   (x, y) = db_cmp ('>=' );
-var db_gt   (x, y) = db_cmp ('>'  );
+var db_ge   = db_cmp ('>='  );
+var db_gt   = db_cmp ('>'   );
 
-var db_le   (x, y) = db_cmp ('<=' );
-var db_lt   (x, y) = db_cmp ('<'  );
+var db_le   = db_cmp ('<='  );
+var db_lt   = db_cmp ('<'   );
 
-var db_and  (x, y) = db_cps ('AND');
-var db_or   (x, y) = db_cps ('OR' );
+var db_and  = db_cps ('AND' );
+var db_or   = db_cps ('OR'  );
 
 //  --
 

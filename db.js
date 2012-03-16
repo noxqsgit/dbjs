@@ -196,7 +196,7 @@ function db (name, def, f, f_error) {                         //  {{{1
           tx.executeSql (sql);
         }
       }
-    ].concat (f_ ()), f_err
+    ].concat (f_ (DB[name])), f_err
   )
 }                                                             //  }}}1
 

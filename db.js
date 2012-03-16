@@ -5,9 +5,9 @@
 //  Date        : 2012-03-16
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
-//  Licence     : GPLv2
+//  Licence     : GPLv2 or EPLv1
 //
-//  TODO: delete !!!
+//  TODO        : ...
 //
 //  --                                                          # }}}1
 
@@ -161,7 +161,7 @@ function db (name, def, f, f_error) {                         //  {{{1
   var f_err = f_error || db_error_cb;
 
   if (def == none) {
-    DB[name].seq (f_ (), f_err);
+    DB[name].seq (f_ (DB[name]), f_err);
 
     return;                                                   //  !!!!
   }

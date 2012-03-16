@@ -24,7 +24,7 @@ function _split_co (s) { return s.trim ().split (/\s*,\s*/); }
 //  --
 
 //
-//  Usage: db_error_cb (e) -> none
+//  :: db_error_cb (e) -> none
 //
 
 function db_error_cb (e) {                                    //  {{{1
@@ -34,7 +34,7 @@ function db_error_cb (e) {                                    //  {{{1
 // --
 
 //
-//  Usage: db_with (name)(f, f_success, f_error) -> none
+//  :: db_with (name)(f, f_success, f_error) -> none
 //
 
 function db_with (name) {                                     //  {{{1
@@ -48,7 +48,7 @@ function db_with (name) {                                     //  {{{1
 
 
 //
-//  Usage: db_seq (name)(fs, f_error) -> none
+//  :: db_seq (name)(fs, f_error) -> none
 //
 
 function db_seq (name) {                                      //  {{{1
@@ -68,7 +68,7 @@ function db_seq (name) {                                      //  {{{1
 
 
 //
-//  Usage: db_defns (name) -> none
+//  :: db_defns (name) -> none
 //
 
 function db_defns (name) {                                    //  {{{1
@@ -95,7 +95,7 @@ function db_defns (name) {                                    //  {{{1
 
 
 //
-//  Usage: db (name, def[, f]) -> none
+//  :: db (name, def[, f, f_error]) -> none
 //
 //  Example:
 //    db (
@@ -114,11 +114,12 @@ function db_defns (name) {                                    //  {{{1
 //    );
 //
 
-function db (name, def, f) {                                  //  {{{1
-  var f_ = f == none ? function () { return []; } : f;
+function db (name, def, f, f_error) {                         //  {{{1
+  var f_    = f       || function () { return []; };
+  var f_err = f_error || db_error_cb;
 
   if (def == none) {
-    DB[name].seq (f_ (), db_error_cb);
+    DB[name].seq (f_ (), f_err);
 
     return;                                                   //  !!!!
   }
@@ -153,15 +154,15 @@ function db (name, def, f) {                                  //  {{{1
           tx.executeSql (sql);
         }
       }
-    ].concat (f_ ()), db_error_cb
+    ].concat (f_ ()), f_err
   )
 }                                                             //  }}}1
 
 // --
 
 //
-//  Usage: db_query (table, fields, f, f_error[, where, where_vals])
-//          -> none
+//  :: db_query (table, fields, f, f_error[, where, where_vals])
+//      -> none
 //
 //  Example:
 //    db (..., function () { return [
@@ -200,7 +201,7 @@ function db_query (table, fields, f, f_error, w, vs) {        //  {{{1
 
 
 //
-//  Usage: db_insert (table, fields, records[, f]) -> none
+//  :: db_insert (table, fields, records[, f]) -> none
 //
 //  Example:
 //    db (..., function () { return [
@@ -242,8 +243,8 @@ function db_insert (table, fields, records, f) {              //  {{{1
 
 
 //
-//  Usage: db_update (table, fields, records[, where_key,
-//                    where_vals_key]) -> none
+//  :: db_update (table, fields, records[, where_key, where_vals_key])
+//      -> none
 //
 //  Example:
 //    db (..., function () { return [

@@ -2,7 +2,7 @@
 //
 //  File        : db.js
 //  Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-//  Date        : 2012-03-16
+//  Date        : 2012-03-18
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
@@ -11,17 +11,19 @@
 //
 //  --                                                          # }}}1
 
-var none  = undefined;
-var DEBUG = true;
-
-var DB    = {};
+var DB_DEBUG  = true;
+var _DB       = {};
 
 //  --
+
+// MOVE {
+
+var none = undefined;
+
 
 function _split_ws (s) { return s.trim ().split (/\s+/    ); }
 function _split_co (s) { return s.trim ().split (/\s*,\s*/); }
 
-//  -- MOVE {
 
 function _die (s) { throw new Error (s); }
 
@@ -29,13 +31,15 @@ function _chk_args (a, n, m) {
   if (a.length < n || a.length > m) { _die ('wrong #args'); }
 }
 
-//  -- } MOVE
+// } MOVE
+
+//  --
 
 //
-//  :: db_cmp (o)(x, y) -> <...>
+//  :: _db_cmp (o)(x, y) -> <...>
 //
 
-function db_cmp (o) {                                         //  {{{1
+function _db_cmp (o) {                                        //  {{{1
   return function (x, y) {
     return { expr: ' ' + x + ' ' + o + ' ? ', vals: [y] };
   };
@@ -43,7 +47,7 @@ function db_cmp (o) {                                         //  {{{1
 
 
 //
-//  :: db_cps (o)(x, y, ...) -> <...>
+//  :: _db_cps (o)(x, y, ...) -> <...>
 //
 
 function db_cps (o) {                                         //  {{{1

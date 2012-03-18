@@ -86,7 +86,7 @@ function _db_defns (name) {                                   //  {{{1
       var T = t[0].toUpperCase () + t.substr (1);
 
       dbo['q' + T] = function (f, f_error, w) {
-        _chk_args (arguments, 2, 3);
+        _chk_args (arguments, 1, 3);
 
         return _db_query (t, dbo.fields[t], f, f_error, w);
       };

@@ -93,11 +93,16 @@ function _db_create_table (tx, tables, k) {                   //  {{{1
 // --
 
 //
-//  :: _db_query (table, fields, f, f_error[, where]) -> none
+//  :: _db_query (table, fields, f[, f_error, where]) -> none
+//
+//  Depends: db_error_cb.
 //
 
 function _db_query (table, fields, f, f_error, where) {       //  {{{1
-  _chk_args (arguments, 4, 5);
+  _chk_args (arguments, 3, 5);
+
+  var f_err = f_error || db_error_cb;
+  var vals  = where == none ? [] : where.vals;
 
   return function (tx) {
     var sql = 'SELECT id, ' + fields.join (', ')
@@ -106,7 +111,7 @@ function _db_query (table, fields, f, f_error, where) {       //  {{{1
 
     if (DB_DEBUG) {
       console.log ('sql:', sql);
-      console.log ('vls:', where.vals);
+      console.log ('vls:', vals);
     }
 
     var g = function (tx, rs) {
@@ -119,7 +124,7 @@ function _db_query (table, fields, f, f_error, where) {       //  {{{1
       }
     };
 
-    tx.executeSql (sql, where.vals, g, f_error);
+    tx.executeSql (sql, vals, g, f_err);
   };
 }                                                             //  }}}1
 

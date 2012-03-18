@@ -35,7 +35,7 @@ function _db_cps (o) {                                        //  {{{1
 
   var f = function (x, y) {
     if (arguments.length < 2) {
-      _die ('too few args');                                  //  TODO
+      _die ('#args not in 2..');
     }
     else if (arguments.length > 2) {
       var rest = Array.prototype.slice.call (arguments, 1);   //  WTF!

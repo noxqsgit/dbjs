@@ -47,7 +47,7 @@ var db_or   = _db_cps ('OR' );
 function db_error_cb (e) {                                    //  {{{1
   _chk_args (arguments, 1, 1);
 
-  db_log ('SQL Error:', e.message);
+  db_log ('SQL Error:', e.message);                           //  !!!!
 }                                                             //  }}}1
 
 // --
@@ -71,7 +71,7 @@ function _db_seq (name) {                                     //  {{{1
 
     for (var i = fs.length - 1; i >= 0; --i) {
       f = (function (g, h) {
-        return function () { w (g, h, f_error); };
+        return function () { w (g, h, f_error); };            //  !!!!
       })(fs[i], f);
     }
 
@@ -97,19 +97,19 @@ function _db_defns (name) {                                   //  {{{1
     (function (t) {
       var T = t[0].toUpperCase () + t.substr (1);
 
-      dbo['q' + T] = function (f, f_error, w) {
+      dbo['q' + T] = function (f, f_error, w) {               //  !!!!
         _chk_args (arguments, 1, 3);
 
         return _db_query (t, dbo.fields[t], f, f_error, w);
       };
 
-      dbo['i' + T] = function (records, f) {
+      dbo['i' + T] = function (records, f) {                  //  !!!!
         _chk_args (arguments, 1, 2);
 
         return _db_insert (t, dbo.fields[t], records, f);
       };
 
-      dbo['u' + T] = function (records) {
+      dbo['u' + T] = function (records) {                     //  !!!!
         _chk_args (arguments, 1, 1);
 
         return _db_update (t, dbo.fields[t], records);
@@ -135,11 +135,11 @@ function db (name, def, f, f_error) {                         //  {{{1
   var f_err = f_error || db_error_cb;
 
   if (def == none) {
-    var dbo = _DB[name];
-    var fs  = [];
+    var dbo = _DB[name];                                      //  !!!!
+    var fs  = [];                                             //  !!!!
   }
   else {
-    var dbo = _DB[name] = {
+    var dbo = _DB[name] = {                                   //  !!!!
       name:     name          ,
       version:  def.version   ,
       desc:     def.desc      ,
@@ -149,22 +149,22 @@ function db (name, def, f, f_error) {                         //  {{{1
       seq:      _db_seq (name),
     };
 
-    var fs = [ function (tx) {
+    var fs = [ function (tx) {                                //  !!!!
       for (var k in def.tables) {
         _db_create_table (tx, def.tables, k);
       }
     } ]
 
     for (var k in def.tables) {
-      dbo.fields[k] = def.tables[k].map (
+      dbo.fields[k] = def.tables[k].map (                     //  !!!!
         function (x) { return _split_ws (x)[0]; }
       );
     }
 
-    _db_defns (name);
+    _db_defns (name);                                         //  !!!!
   }
 
-  dbo.seq (fs.concat (f_ (dbo)), f_err);
+  dbo.seq (fs.concat (f_ (dbo)), f_err);                      //  !!!!
 }                                                             //  }}}1
 
 //  --

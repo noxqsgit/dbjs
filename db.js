@@ -7,12 +7,19 @@
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
 //
+//  Depends     : ...
+//  Description : ...
+//
 //  TODO        : ...
 //
 //  --                                                          # }}}1
 
 var DB_DEBUG  = true;
 var _DB       = {};
+
+//  --
+
+var db_log = function () { console.log.apply (console, arguments); }
 
 //  --
 
@@ -33,13 +40,14 @@ var db_or   = _db_cps ('OR' );
 //
 //  :: db_error_cb (e) -> none
 //
-//  Depends: console.log.
+//  Depends     : db_log.
+//  Description : default error callback; logs to console.
 //
 
 function db_error_cb (e) {                                    //  {{{1
   _chk_args (arguments, 1, 1);
 
-  console.log ('SQL Error:', e.message);
+  db_log ('SQL Error:', e.message);
 }                                                             //  }}}1
 
 // --
@@ -47,16 +55,18 @@ function db_error_cb (e) {                                    //  {{{1
 //
 //  :: _db_seq (name)(fs, f_error) -> none
 //
-//  Depends: _db_with.
+//  Depends     : _db_with.
+//  Description : sequences db functions.
 //
 
 function _db_seq (name) {                                     //  {{{1
   _chk_args (arguments, 1, 1);
 
+  var w = _db_with (name);
+
   return function (fs, f_error) {
     _chk_args (arguments, 2, 2);
 
-    var w = _db_with (name);
     var f = function () {};
 
     for (var i = fs.length - 1; i >= 0; --i) {
@@ -69,11 +79,13 @@ function _db_seq (name) {                                     //  {{{1
   };
 }                                                             //  }}}1
 
+//  --
 
 //
 //  :: _db_defns (name) -> none
 //
-//  Depends: _DB; _db_query, _db_insert, _db_update.
+//  Depends     : _DB; _db_{query,insert,update}.
+//  Description : defines table functions in DB obj.
 //
 
 function _db_defns (name) {                                   //  {{{1
@@ -111,7 +123,9 @@ function _db_defns (name) {                                   //  {{{1
 //
 //  :: db (name, def[, f, f_error]) -> none
 //
-//  Depends: _DB, _db_seq, _db_create_table, _db_defns; db_error_cb.
+//  Depends     : _DB, _db_seq, _db_create_table, _db_defns;
+//                db_error_cb.
+//  Description : defines database; runs functions.
 //
 
 function db (name, def, f, f_error) {                         //  {{{1

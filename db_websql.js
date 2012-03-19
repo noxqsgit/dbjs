@@ -206,11 +206,13 @@ function _db_update (table, fields, records, f_error, wk) {   //  {{{1
 
   return function (tx) {
     for (var i in records) {
-      var flds = fields.filter (
+      var fs      = fields.filter (
         function (x) { return records[i][x] != none; }
-      ).map (
+      );
+
+      var flds    = fs.map (
         function (x) { return x + ' = ?'; }
-      ).join (', ')
+      ).join (', ');
 
       var r_vals  = fs.map (function (x) { return records[i][x]; });
       var w_vals  = records[i][wk_].vals;

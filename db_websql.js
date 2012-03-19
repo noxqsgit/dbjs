@@ -165,18 +165,24 @@ function _db_insert (table, fields, records, f, f_error) {    //  {{{1
     var ids = [];                                             //  !!!!
 
     for (var i in records) {
+      var id    = records[i].id;
+      var fid   = id == none ? 'NULL' : '?';
+      var fs    = id == none ? fields : ['id'].concat (fields);
+      var vals  = fs.map (function (x) { return records[i][x]; });
+
       var sql = 'INSERT INTO ' + table
               + ' ( id, ' + fields.join (', ')
-              + ' ) VALUES ( NULL, ' + qms + ' )';
+              + ' ) VALUES ( ' + fid + ', ' + qms + ' )';
 
       if (DB_DEBUG) {                                         //  !!!!
         db_log ('sql:', sql);
+        db_log ('vls:', vals);
         db_log ('rec:', records[i]);
       }
 
       tx.executeSql (                                         //  !!!!
         sql,
-        fields.map (function (x) { return records[i][x]; }),
+        vals,
         function (tx, rs) {
           if (DB_DEBUG) { db_log ('res:', rs); }              //  !!!!
 

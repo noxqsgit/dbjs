@@ -41,16 +41,21 @@ var db_id   = function (id) { return db_eq ('id', id); }
 //  --
 
 //
-//  :: db_error_cb (e) -> none
+//  :: db_error_cb ([tx,] e) -> none
 //
 //  Depends     : db_log.
 //  Description : default error callback; logs to console.
 //
 
-function db_error_cb (e) {                                    //  {{{1
-  _chk_args (arguments, 1, 1);
+function db_error_cb () {                                     //  {{{1
+  _chk_args (arguments, 1, 2);
 
-  db_log ('SQL Error:', e.message);                           //  !!!!
+  if (arguments.length == 1) {
+    db_log ('SQL Error:', arguments[0].message);              //  !!!!
+  }
+  else {
+    db_log ('SQL Transaction Error:', arguments[1].message);  //  !!!!
+  }
 }                                                             //  }}}1
 
 // --

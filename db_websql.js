@@ -158,6 +158,7 @@ function _db_insert (table, fields, records, f, f_error) {    //  {{{1
   _chk_args (arguments, 3, 5);
 
   var f_err = f_error || db_error_cb;
+  var n     = records.length;
 
   return function (tx) {
     var qms = fields.map (function (x) { return '?'; }).join (', ');
@@ -180,12 +181,14 @@ function _db_insert (table, fields, records, f, f_error) {    //  {{{1
           if (DB_DEBUG) { db_log ('res:', rs); }              //  !!!!
 
           ids.push (rs.insertId);                             //  !!!!
+
+          // NB: must call f here to prevent async problems!
+
+          if (f && ids.length == n) { f (ids); }              //  !!!!
         },
         f_err
       );
     }
-
-    if (f != none) { f (ids); }                               //  !!!!
   };
 }                                                             //  }}}1
 

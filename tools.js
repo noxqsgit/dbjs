@@ -23,6 +23,11 @@ function _split_co (s) { return s.trim ().split (/\s*,\s*/); }
 
 //  --
 
+function _to_json   (x) { return JSON.stringify (x, none, 2); }
+function _from_json (x) { return JSON.parse (x);              }
+
+//  --
+
 function _die (s) {
   throw new Error (s);                                        //  !!!!
 }

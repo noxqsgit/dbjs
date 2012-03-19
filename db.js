@@ -61,16 +61,16 @@ function db_error_cb () {                                     //  {{{1
 // --
 
 //
-//  :: _db_seq (name)(fs, f_error) -> none
+//  :: _db_seq (dbo)(fs, f_error) -> none
 //
 //  Depends     : _db_with.
 //  Description : sequences db functions.
 //
 
-function _db_seq (name) {                                     //  {{{1
+function _db_seq (dbo) {                                      //  {{{1
   _chk_args (arguments, 1, 1);
 
-  var w = _db_with (name);
+  var w = _db_with (dbo);
 
   return function (fs, f_error) {
     _chk_args (arguments, 2, 2);
@@ -90,38 +90,106 @@ function _db_seq (name) {                                     //  {{{1
 //  --
 
 //
-//  :: _db_defns (name) -> none
+//  :: _db_dump (dbo)(f[, f_error, f_dump])([tx]) -> none
 //
-//  Depends     : _DB; _db_{query,insert,update}.
+//  Description : dumps the DB.
+//
+
+function _db_dump (dbo) {                                     //  {{{1
+  _chk_args (arguments, 1, 1);
+
+  return function (f, f_error, f_dump) {
+    _chk_args (arguments, 1, 3);
+
+    var f_err = f_error || db_error_cb;
+    var f_d   = f_error || _to_json;
+
+    var fs    = [];                                           //  !!!!
+    var recs  = {};                                           //  !!!!
+
+    for (var t_ in dbo.tables) {
+      recs[t_] = [];                                          //  !!!!
+
+      (function (t) {
+        fs.push (dbo['q_' + t] (function (i, x) {             //  !!!!
+          recs[t].push (x);                                   //  !!!!
+        } ));
+      })(t_);
+    }
+
+    fs.push (function () { f (f_d (recs)); });                //  !!!!
+
+    return function () { dbo.seq (fs, f_err); };              //  !!!!
+  };
+}                                                             //  }}}1
+
+
+//
+//  :: _db_load (dbo)(data[, f_error, f_load])([tx]) -> none
+//
+//  Description : loads the DB.
+//
+
+function _db_load (dbo) {                                     //  {{{1
+  _chk_args (arguments, 1, 1);
+
+  return function (data, f_error, f_dump) {
+    _chk_args (arguments, 1, 3);
+
+    var f_err = f_error || db_error_cb;
+    var f_d   = f_error || _from_json;
+
+    var recs  = f_d (data);                                   //  !!!!
+    var fs    = [];                                           //  !!!!
+
+    for (var t_ in dbo.tables) {
+      fs.push (dbo['i_' + t_] (recs[t_]));
+    }
+
+    return function () { dbo.seq (fs, f_err); };              //  !!!!
+  };
+}                                                             //  }}}1
+
+//  --
+
+//
+//  :: _db_defns (dbo) -> none
+//
+//  Depends     : _db_{dump,load,query,insert,update}.
 //  Description : defines table functions in DB obj.
 //
 
-function _db_defns (name) {                                   //  {{{1
+function _db_defns (dbo) {                                    //  {{{1
   _chk_args (arguments, 1, 1);
 
-  var dbo = _DB[name];
+  dbo.dump = _db_dump (dbo);
+  dbo.load = _db_load (dbo);
 
   for (var t_ in dbo.tables) {
     (function (t) {
       var T = t[0].toUpperCase () + t.substr (1);
 
-      dbo['q' + T] = function (f, f_error, w) {               //  !!!!
+      //  !!!! {
+
+      dbo['q_' + t] = dbo['q' + T] = function (f, f_error, w) {
         _chk_args (arguments, 1, 3);
 
         return _db_query (t, dbo.fields[t], f, f_error, w);
       };
 
-      dbo['i' + T] = function (records, f, f_error) {         //  !!!!
+      dbo['i_' + t] = dbo['i' + T] = function (records, f, f_error) {
         _chk_args (arguments, 1, 3);
 
         return _db_insert (t, dbo.fields[t], records, f);
       };
 
-      dbo['u' + T] = function (records, f_error) {            //  !!!!
+      dbo['u_' + t] = dbo['u' + T] = function (records, f_error) {
         _chk_args (arguments, 1, 2);
 
         return _db_update (t, dbo.fields[t], records);
       };
+
+      //  } !!!!
     })(t_);
   }
 }                                                             //  }}}1
@@ -148,14 +216,15 @@ function db (name, def, f, f_error) {                         //  {{{1
   }
   else {
     var dbo = _DB[name] = {                                   //  !!!!
-      name:     name          ,
-      version:  def.version   ,
-      desc:     def.desc      ,
-      size:     def.size      ,
-      tables:   def.tables    ,
-      fields:   {}            ,
-      seq:      _db_seq (name),
+      name    : name          ,
+      version : def.version   ,
+      desc    : def.desc      ,
+      size    : def.size      ,
+      tables  : def.tables    ,
+      fields  : {}            ,
     };
+
+    dbo.seq = _db_seq (dbo);                                  //  !!!!
 
     var fs = [ function (tx) {                                //  !!!!
       for (var k in def.tables) {
@@ -169,7 +238,7 @@ function db (name, def, f, f_error) {                         //  {{{1
       );
     }
 
-    _db_defns (name);                                         //  !!!!
+    _db_defns (dbo);                                          //  !!!!
   }
 
   dbo.seq (fs.concat (f_ (dbo)), f_err);                      //  !!!!

@@ -64,21 +64,20 @@ function _db_cps (o) {                                        //  {{{1
 //  --
 
 //
-//  :: _db_with (name)(f, f_success, f_error) -> none
+//  :: _db_with (dbo)(f, f_success, f_error) -> none
 //
-//  Depends     : window.openDatabase; _DB.
+//  Depends     : window.openDatabase.
 //  Description : opens database; performs transaction.
 //
 
-function _db_with (name) {                                    //  {{{1
+function _db_with (dbo) {                                     //  {{{1
   _chk_args (arguments, 1, 1);
 
   return function (f, f_success, f_error) {
     _chk_args (arguments, 3, 3);
 
-    var dbo = _DB[name];
     var dbh = window.openDatabase (                           //  !!!!
-      name, dbo.version, dbo.desc, dbo.size
+      dbo.name, dbo.version, dbo.desc, dbo.size
     );
     dbh.transaction (f, f_error, f_success);                  //  !!!!
   };

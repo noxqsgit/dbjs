@@ -35,6 +35,9 @@ var db_lt   = _db_cmp ('<'  );
 var db_and  = _db_cps ('AND');
 var db_or   = _db_cps ('OR' );
 
+
+var db_id   = function (id) { return db_eq ('id', id); }
+
 //  --
 
 //

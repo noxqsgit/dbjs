@@ -151,7 +151,7 @@ function db (name, def, f, f_error) {                         //  {{{1
 
     var fs = [ function (tx) {                                //  !!!!
       for (var k in def.tables) {
-        _db_create_table (tx, def.tables, k);
+        _db_create_table (k, def.tables, f_err)(tx);
       }
     } ]
 

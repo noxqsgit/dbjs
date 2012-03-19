@@ -7,6 +7,9 @@
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
 //
+//  Depends     : ...
+//  Description : ...
+//
 //  TODO        : ...
 //
 //  --                                                          # }}}1

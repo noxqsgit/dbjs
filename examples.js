@@ -35,6 +35,14 @@ db (dbName, dbDef, function (dbo) { return [
   }, none, db_and (db_ne ('id', 7), db_gt ('id', 4)) ),
 
 
+  // dump DB
+  dbo.dump (function (data) { console.log ('dump=', data); }),
+
+
+  // load DB (you need to delete the DB first)
+  // dbo.load (data),
+
+
   // function (tx) { ... }, ...
 
 

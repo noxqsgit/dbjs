@@ -103,14 +103,14 @@ function _db_defns (name) {                                   //  {{{1
         return _db_query (t, dbo.fields[t], f, f_error, w);
       };
 
-      dbo['i' + T] = function (records, f) {                  //  !!!!
-        _chk_args (arguments, 1, 2);
+      dbo['i' + T] = function (records, f, f_error) {         //  !!!!
+        _chk_args (arguments, 1, 3);
 
         return _db_insert (t, dbo.fields[t], records, f);
       };
 
-      dbo['u' + T] = function (records) {                     //  !!!!
-        _chk_args (arguments, 1, 1);
+      dbo['u' + T] = function (records, f_error) {            //  !!!!
+        _chk_args (arguments, 1, 2);
 
         return _db_update (t, dbo.fields[t], records);
       };

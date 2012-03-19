@@ -7,12 +7,18 @@
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
 //
+//  Depends     : ...
+//  Description : ...
+//
 //  TODO        : ...
 //
 //  --                                                          # }}}1
 
 //
-//  :: _db_cmp (o)(x, y) -> <...>
+//  :: _db_cmp (o)(x, y) -> { expr: ..., vals: ... }
+//
+//  Description : returns a function that returns a filter object for
+//                the specified comparison operator.
 //
 
 function _db_cmp (o) {                                        //  {{{1
@@ -27,7 +33,11 @@ function _db_cmp (o) {                                        //  {{{1
 
 
 //
-//  :: _db_cps (o)(x, y, ...) -> <...>
+//  :: _db_cps (o)(x, y, ...) -> { expr: ..., vals: ... }
+//
+//  Description : returns a function that returns a filter object that
+//                combines multiple filter objects with the specified
+//                composition operator.
 //
 
 function _db_cps (o) {                                        //  {{{1
@@ -35,10 +45,10 @@ function _db_cps (o) {                                        //  {{{1
 
   var f = function (x, y) {
     if (arguments.length < 2) {
-      _die ('#args not in 2..');
+      _die ('#args not in 2..');                              //  !!!!
     }
     else if (arguments.length > 2) {
-      var rest = Array.prototype.slice.call (arguments, 1);   //  WTF!
+      var rest = Array.prototype.slice.call (arguments, 1);   //  !!!!
 
       return f (x, f.apply (null, rest));                     //  TODO
     }
@@ -56,7 +66,8 @@ function _db_cps (o) {                                        //  {{{1
 //
 //  :: _db_with (name)(f, f_success, f_error) -> none
 //
-//  Depends: window.openDatabase; _DB.
+//  Depends     : window.openDatabase; _DB.
+//  Description : opens database; performs transaction.
 //
 
 function _db_with (name) {                                    //  {{{1
@@ -66,36 +77,43 @@ function _db_with (name) {                                    //  {{{1
     _chk_args (arguments, 3, 3);
 
     var dbo = _DB[name];
-    var dbh = window.openDatabase (
+    var dbh = window.openDatabase (                           //  !!!!
       name, dbo.version, dbo.desc, dbo.size
     );
-    dbh.transaction (f, f_error, f_success);
+    dbh.transaction (f, f_error, f_success);                  //  !!!!
   };
 }                                                             //  }}}1
 
+//  --
 
 //
-//  :: _db_create_table (tx, tables, k) -> none
+//  :: _db_create_table (tbl, tables, f_error)(tx) -> none
+//
+//  Depends     : DB_DEBUG -> db_log.
+//  Description : creates table.
 //
 
-function _db_create_table (tx, tables, k) {                   //  {{{1
+function _db_create_table (tbl, tables, f_error) {            //  {{{1
   _chk_args (arguments, 3, 3);
 
-  var sql = 'CREATE TABLE IF NOT EXISTS '
-          + k + ' ( id INTEGER PRIMARY KEY, '
-          + tables[k].join (', ') + ' )';
+  return function (tx) {
+    var sql = 'CREATE TABLE IF NOT EXISTS '
+            + tbl + ' ( id INTEGER PRIMARY KEY, '
+            + tables[tbl].join (', ') + ' )';
 
-  if (DB_DEBUG) { console.log ('sql:', sql); }
+    if (DB_DEBUG) { db_log ('sql:', sql); }                   //  !!!!
 
-  tx.executeSql (sql);
+    tx.executeSql (sql, none, none, f_error);                 //  !!!!
+  };
 }                                                             //  }}}1
 
 // --
 
 //
-//  :: _db_query (table, fields, f[, f_error, where]) -> none
+//  :: _db_query (table, fields, f[, f_error, where])(tx) -> none
 //
-//  Depends: db_error_cb.
+//  Depends     : DB_DEBUG -> db_log; db_error_cb.
+//  Description : queries DB.
 //
 
 function _db_query (table, fields, f, f_error, where) {       //  {{{1
@@ -109,32 +127,37 @@ function _db_query (table, fields, f, f_error, where) {       //  {{{1
             + ' FROM ' + table
             + (where == none ? '' : ' WHERE ' + where.expr.trim ());
 
-    if (DB_DEBUG) {
-      console.log ('sql:', sql);
-      console.log ('vls:', vals);
+    if (DB_DEBUG) {                                           //  !!!!
+      db_log ('sql:', sql);
+      db_log ('vls:', vals);
     }
 
     var g = function (tx, rs) {
-      if (DB_DEBUG) { console.log ('res:', rs); }
+      if (DB_DEBUG) { db_log ('res:', rs); }                  //  !!!!
 
       var len = rs.rows.length;
 
       for (var i = 0; i < len; ++i) {
-        f (i, rs.rows.item(i));
+        f (i, rs.rows.item(i));                               //  !!!!
       }
     };
 
-    tx.executeSql (sql, vals, g, f_err);
+    tx.executeSql (sql, vals, g, f_err);                      //  !!!!
   };
 }                                                             //  }}}1
 
 
 //
-//  :: _db_insert (table, fields, records[, f]) -> none
+//  :: _db_insert (table, fields, records[, f, f_error])(tx) -> none
+//
+//  Depends     : DB_DEBUG -> db_log; db_error_cb.
+//  Description : inserts into DB.
 //
 
-function _db_insert (table, fields, records, f) {             //  {{{1
-  _chk_args (arguments, 3, 4);
+function _db_insert (table, fields, records, f, f_error) {    //  {{{1
+  _chk_args (arguments, 3, 5);
+
+  var f_err = f_error || db_error_cb;
 
   return function (tx) {
     var qms = fields.map (function (x) { return '?'; }).join (', ');
@@ -145,57 +168,64 @@ function _db_insert (table, fields, records, f) {             //  {{{1
               + ' ( id, ' + fields.join (', ')
               + ' ) VALUES ( NULL, ' + qms + ' )';
 
-      if (DB_DEBUG) {
-        console.log ('sql:', sql);
-        console.log ('rec:', records[i]);
+      if (DB_DEBUG) {                                         //  !!!!
+        db_log ('sql:', sql);
+        db_log ('rec:', records[i]);
       }
 
-      tx.executeSql (
-        sql, fields.map (function (x) { return records[i][x]; }),
+      tx.executeSql (                                         //  !!!!
+        sql,
+        fields.map (function (x) { return records[i][x]; }),
         function (tx, rs) {
-          if (DB_DEBUG) { console.log ('res:', rs); }
+          if (DB_DEBUG) { db_log ('res:', rs); }              //  !!!!
 
           ids.push (rs.insertId);                             //  !!!!
-        }
+        },
+        f_err
       );
     }
 
-    if (f != none) { f (ids); }
+    if (f != none) { f (ids); }                               //  !!!!
   };
 }                                                             //  }}}1
 
 
 //
-//  :: _db_update (table, fields, records[, where_key]) -> none
+//  :: _db_update (table, fields, records[, f_error, where_key])(tx)
+//      -> none
+//
+//  Depends     : DB_DEBUG -> db_log; db_error_cb.
+//  Description : updates DB.
 //
 
-function _db_update (table, fields, records, wk) {            //  {{{1
+function _db_update (table, fields, records, f_error, wk) {   //  {{{1
   _chk_args (arguments, 3, 5);
 
-  wk_ = wk == none ? '_W_' : wk;
+  var f_err = f_error || db_error_cb;
+  var wk_   = wk == none ? '_W_' : wk;
 
   return function (tx) {
     for (var i in records) {
-      var fs = fields.filter (
-        function (x) { return records[i][x] != none }
-      );
+      var flds = fields.filter (
+        function (x) { return records[i][x] != none; }
+      ).map (
+        function (x) { return x + ' = ?'; }
+      ).join (', ')
 
       var r_vals  = fs.map (function (x) { return records[i][x]; });
       var w_vals  = records[i][wk_].vals;
       var vals    = r_vals.concat (w_vals);
 
-      var sql
-        = 'UPDATE ' + table + ' SET '
-        + fs.map (function (x) { return x + ' = ?' }).join (', ')
-        + ' WHERE ' + records[i][wk_].expr.trim ();
+      var sql = 'UPDATE ' + table + ' SET ' + flds
+              + ' WHERE ' + records[i][wk_].expr.trim ();
 
-      if (DB_DEBUG) {
-        console.log ('sql:', sql);
-        console.log ('vls:', vals);
-        console.log ('rec:', records[i]);
+      if (DB_DEBUG) {                                         //  !!!!
+        db_log ('sql:', sql);
+        db_log ('vls:', vals);
+        db_log ('rec:', records[i]);
       }
 
-      tx.executeSql (sql, vals);
+      tx.executeSql (sql, vals, none, f_err);                 //  !!!!
     }
   };
 }                                                             //  }}}1

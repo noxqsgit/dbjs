@@ -32,7 +32,7 @@ db (dbName, dbDef, function (dbo) { return [
   // query records / callback; w/ filter
   dbo.qFoo (function (i, x) {
     console.log ('#=' + i, 'id=' + x.id, 'obj=', x);
-  }, none, db_and (db_ne ('id', 1), db_gt ('id', 4)) ),
+  }, none, db_and (db_ne ('id', 7), db_gt ('id', 4)) ),
 
 
   // function (tx) { ... }, ...

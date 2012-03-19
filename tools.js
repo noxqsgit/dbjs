@@ -23,11 +23,13 @@ function _split_co (s) { return s.trim ().split (/\s*,\s*/); }
 
 //  --
 
-function _die (s) { throw new Error (s); }
+function _die (s) {
+  throw new Error (s);                                        //  !!!!
+}
 
 function _chk_args (a, n, m) {
   if (a.length < n || a.length > m) {
-    _die ('#args not in ' + n + '..' + m);
+    _die ('#args not in ' + n + '..' + m);                    //  !!!!
   }
 }
 

@@ -182,19 +182,19 @@ db._defns = function (dbo) {                                  //  {{{1
       dbo['q_' + t] = dbo['q' + T] = function (f, f_error, w) {
         tools.chk_args (arguments, 1, 3);
 
-        return _db_query (t, dbo.fields[t], f, f_error, w);
+        return db._query (t, dbo.fields[t], f, f_error, w);
       };
 
       dbo['i_' + t] = dbo['i' + T] = function (records, f, f_error) {
         tools.chk_args (arguments, 1, 3);
 
-        return _db_insert (t, dbo.fields[t], records, f);
+        return db._insert (t, dbo.fields[t], records, f);
       };
 
       dbo['u_' + t] = dbo['u' + T] = function (records, f_error) {
         tools.chk_args (arguments, 1, 2);
 
-        return _db_update (t, dbo.fields[t], records);
+        return db._update (t, dbo.fields[t], records);
       };
 
       // TODO: delete

@@ -25,14 +25,14 @@ dbjs.do (dbName, dbDef, function (dbo) { return [
 
   // update records
   dbo.uFoo ([
-    { y: -1, _W_: db.eq ('id', 2) },
+    { y: -1, _W_: dbjs.eq ('id', 2) },
   ]),
 
 
   // query records / callback; w/ filter
   dbo.qFoo (function (i, x) {
     console.log ('#=' + i, 'id=' + x.id, 'obj=', x);
-  }, none, db.and (db.ne ('id', 7), db.gt ('id', 4)) ),
+  }, none, dbjs.and (dbjs.ne ('id', 7), dbjs.gt ('id', 4)) ),
 
 
   // dump DB

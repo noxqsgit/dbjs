@@ -2,7 +2,7 @@
 
 File        : README
 Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-Date        : 2012-04-17
+Date        : 2012-04-18
 
 Copyright   : Copyright (C) 2012  Felix C. Stegerman
 Version     : v0.1.0-dev
@@ -26,8 +26,8 @@ Version     : v0.1.0-dev
 
 === Depends ===                                                   {{{1
 
-  The current implementation using the websql backend works on chrome,
-  android and iOS; not on firefox.
+  The current implementation using the websql backend works on
+  chrom{e,ium}, android, and iOS; not on firefox.
 
   ...
                                                                   }}}1

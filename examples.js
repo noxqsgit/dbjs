@@ -9,7 +9,7 @@ var dbDef   = {
   }
 };
 
-db (dbName, dbDef, function (dbo) { return [
+dbjs.do (dbName, dbDef, function (dbo) { return [
 
   // insert records
   dbo.iFoo ([
@@ -49,7 +49,7 @@ db (dbName, dbDef, function (dbo) { return [
   // NB: you should probably set event handlers that use the database
   // here, after the initialisation.
 
-  // NB: you can nest db calls w/out redefining:
-  // db (dbName, none, ...);
+  // NB: you can nest do calls w/out redefining:
+  // dbjs.do (dbName, none, ...);
 
 ]; });

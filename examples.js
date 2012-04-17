@@ -4,7 +4,7 @@ var dbDef   = {
   desc    : '...' ,
   size    : 200000,
   tables  : {
-    foo : _split_co ('x TEXT, y INTEGER'),
+    foo : tools.split_co ('x TEXT, y INTEGER'),
     bar : ['z TEXT'],
   }
 };

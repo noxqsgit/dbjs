@@ -1,0 +1,61 @@
+--                                                                {{{1
+
+File        : README
+Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
+Date        : 2012-04-17
+
+Copyright   : Copyright (C) 2012  Felix C. Stegerman
+Version     : v0.1.0-dev
+
+--                                                                }}}1
+
+=== Description ===                                               {{{1
+
+  dbjs - javascript web database abstraction library
+
+  ...
+
+  See examples.html for an annotated example of the current
+  implementation.
+                                                                  }}}1
+
+=== License ===                                                   {{{1
+
+  GPLv2 [1] or EPLv1 [2].
+                                                                  }}}1
+
+=== Depends ===                                                   {{{1
+
+  The current implementation using the websql backend works on chrome,
+  android and iOS; not on firefox.
+
+  ...
+                                                                  }}}1
+
+=== Usage ===                                                     {{{1
+
+  Get it at https://github.com/noxqsgit/dbjs.
+
+  ...
+                                                                  }}}1
+
+=== TODO ===                                                      {{{1
+
+  * v0.1.0 - the basics (w/out delete)
+  * v0.2.0 - delete
+  * v0.3.0 - more backends (like indexeddb?)
+  * ...
+                                                                  }}}1
+
+=== References ===                                                {{{1
+
+  [1] GNU General Public License, version 2
+      http://www.opensource.org/licenses/GPL-2.0
+
+  [2] Eclipse Public License, version 1
+      http://www.opensource.org/licenses/EPL-1.0
+                                                                  }}}1
+
+--
+
+vim: set tw=70 sw=2 sts=2 et fdm=marker :

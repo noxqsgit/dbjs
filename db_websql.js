@@ -2,7 +2,7 @@
 //
 //  File        : db_websql.js
 //  Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-//  Date        : 2012-04-17
+//  Date        : 2012-04-18
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
@@ -189,20 +189,17 @@ db._insert = function (table, fields, records, f, f_error) {  //  {{{1
         db.log ('rec:', records[i]);
       }
 
-      tx.executeSql (                                         //  !!!!
-        sql,
-        vals,
-        function (tx, rs) {
-          if (db.DEBUG) { db.log ('res:', rs); }              //  !!!!
+      var g = function (tx, rs) {
+        if (db.DEBUG) { db.log ('res:', rs); }                //  !!!!
 
-          ids.push (rs.insertId);                             //  !!!!
+        ids.push (rs.insertId);                               //  !!!!
 
-          // NB: must call f here to prevent async problems!
+        // NB: must call f here to prevent async problems!
 
-          if (f && ids.length == n) { f (ids); }              //  !!!!
-        },
-        f_err
-      );
+        if (f && ids.length == n) { f (ids); }                //  !!!!
+      };
+
+      tx.executeSql (sql, vals, g, f_err);                    //  !!!!
     }
   };
 }                                                             //  }}}1
@@ -247,6 +244,39 @@ db._update = function (table, fields, records, f_error, wk) { //  {{{1
 
       tx.executeSql (sql, vals, none, f_err);                 //  !!!!
     }
+  };
+}                                                             //  }}}1
+
+
+//
+//  :: _delete (table, f[, f_error, where])(tx) -> none
+//
+//  Depends     : DEBUG -> log; error_cb.
+//  Description : deletes from DB.
+//
+
+db._delete = function (table, f, f_error, where) {            //  {{{1
+  tools.chk_args (arguments, 2, 4);
+
+  var f_err = f_error || db.error_cb;
+  var vals  = where == none ? [] : where.vals;
+
+  return function (tx) {
+    var sql = 'DELETE FROM ' + table
+            + (where == none ? '' : ' WHERE ' + where.expr.trim ());
+
+    if (db.DEBUG) {                                           //  !!!!
+      db.log ('sql:', sql);
+      db.log ('vls:', vals);
+    }
+
+    var g = function (tx, rs) {
+      if (db.DEBUG) { db.log ('res:', rs); }                  //  !!!!
+
+      // ...
+    };
+
+    tx.executeSql (sql, vals, g, f_err);                      //  !!!!
   };
 }                                                             //  }}}1
 

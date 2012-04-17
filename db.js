@@ -2,7 +2,7 @@
 //
 //  File        : db.js
 //  Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-//  Date        : 2012-04-17
+//  Date        : 2012-04-18
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
@@ -197,7 +197,11 @@ db._defns = function (dbo) {                                  //  {{{1
         return db._update (t, dbo.fields[t], records);
       };
 
-      // TODO: delete
+      dbo['d_' + t] = dbo['d' + T] = function (f, f_error, w) {
+        tools.chk_args (arguments, 1, 3);
+
+        return db._delete (t, f, f_error, w);
+      };
 
       //  } !!!!
     })(t_);

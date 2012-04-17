@@ -1,8 +1,8 @@
-//  --                                                          # {{{1
+//  --                                                            {{{1
 //
 //  File        : db_websql.js
 //  Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-//  Date        : 2012-03-18
+//  Date        : 2012-04-17
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
@@ -12,20 +12,30 @@
 //
 //  TODO        : ...
 //
-//  --                                                          # }}}1
+//  --                                                            }}}1
+
+this.dbjs = {};
+
+//  --
+
+(function (_this) {
+
+var db = _this.dbjs;
+
+//  --
 
 //
-//  :: _db_cmp (o)(x, y) -> { expr: ..., vals: ... }
+//  :: _cmp (o)(x, y) -> { expr: ..., vals: ... }
 //
 //  Description : returns a function that returns a filter object for
 //                the specified comparison operator.
 //
 
-function _db_cmp (o) {                                        //  {{{1
-  _chk_args (arguments, 1, 1);
+db._cmp = function (o) {                                      //  {{{1
+  tools.chk_args (arguments, 1, 1);
 
   return function (x, y) {
-    _chk_args (arguments, 2, 2);
+    tools.chk_args (arguments, 2, 2);
 
     return { expr: ' ' + x + ' ' + o + ' ? ', vals: [y] };
   };
@@ -33,19 +43,19 @@ function _db_cmp (o) {                                        //  {{{1
 
 
 //
-//  :: _db_cps (o)(x, y, ...) -> { expr: ..., vals: ... }
+//  :: _cps (o)(x, y, ...) -> { expr: ..., vals: ... }
 //
 //  Description : returns a function that returns a filter object that
 //                combines multiple filter objects with the specified
 //                composition operator.
 //
 
-function _db_cps (o) {                                        //  {{{1
-  _chk_args (arguments, 1, 1);
+db._cps = function (o) {                                      //  {{{1
+  tools.chk_args (arguments, 1, 1);
 
   var f = function (x, y) {
     if (arguments.length < 2) {
-      _die ('#args not in 2..');                              //  !!!!
+      tools.die ('#args not in 2..');                         //  !!!!
     }
     else if (arguments.length > 2) {
       var rest = Array.prototype.slice.call (arguments, 1);   //  !!!!
@@ -64,17 +74,17 @@ function _db_cps (o) {                                        //  {{{1
 //  --
 
 //
-//  :: _db_with (dbo)(f, f_success, f_error) -> none
+//  :: _with (dbo)(f, f_success, f_error) -> none
 //
 //  Depends     : window.openDatabase.
 //  Description : opens database; performs transaction.
 //
 
-function _db_with (dbo) {                                     //  {{{1
-  _chk_args (arguments, 1, 1);
+db._with = function (dbo) {                                   //  {{{1
+  tools.chk_args (arguments, 1, 1);
 
   return function (f, f_success, f_error) {
-    _chk_args (arguments, 3, 3);
+    tools.chk_args (arguments, 3, 3);
 
     var dbh = window.openDatabase (                           //  !!!!
       dbo.name, dbo.version, dbo.desc, dbo.size
@@ -86,21 +96,21 @@ function _db_with (dbo) {                                     //  {{{1
 //  --
 
 //
-//  :: _db_create_table (tbl, tables, f_error)(tx) -> none
+//  :: _create_table (tbl, tables, f_error)(tx) -> none
 //
-//  Depends     : DB_DEBUG -> db_log.
+//  Depends     : DEBUG -> log.
 //  Description : creates table.
 //
 
-function _db_create_table (tbl, tables, f_error) {            //  {{{1
-  _chk_args (arguments, 3, 3);
+db._create_table = function (tbl, tables, f_error) {          //  {{{1
+  tools.chk_args (arguments, 3, 3);
 
   return function (tx) {
     var sql = 'CREATE TABLE IF NOT EXISTS '
             + tbl + ' ( id INTEGER PRIMARY KEY, '
             + tables[tbl].join (', ') + ' )';
 
-    if (DB_DEBUG) { db_log ('sql:', sql); }                   //  !!!!
+    if (db.DEBUG) { db.log ('sql:', sql); }                   //  !!!!
 
     tx.executeSql (sql, none, none, f_error);                 //  !!!!
   };
@@ -109,16 +119,16 @@ function _db_create_table (tbl, tables, f_error) {            //  {{{1
 // --
 
 //
-//  :: _db_query (table, fields, f[, f_error, where])(tx) -> none
+//  :: _query (table, fields, f[, f_error, where])(tx) -> none
 //
-//  Depends     : DB_DEBUG -> db_log; db_error_cb.
+//  Depends     : DEBUG -> log; error_cb.
 //  Description : queries DB.
 //
 
-function _db_query (table, fields, f, f_error, where) {       //  {{{1
-  _chk_args (arguments, 3, 5);
+db._query = function (table, fields, f, f_error, where) {     //  {{{1
+  tools.chk_args (arguments, 3, 5);
 
-  var f_err = f_error || db_error_cb;
+  var f_err = f_error || db.error_cb;
   var vals  = where == none ? [] : where.vals;
 
   return function (tx) {
@@ -126,13 +136,13 @@ function _db_query (table, fields, f, f_error, where) {       //  {{{1
             + ' FROM ' + table
             + (where == none ? '' : ' WHERE ' + where.expr.trim ());
 
-    if (DB_DEBUG) {                                           //  !!!!
-      db_log ('sql:', sql);
-      db_log ('vls:', vals);
+    if (db.DEBUG) {                                           //  !!!!
+      db.log ('sql:', sql);
+      db.log ('vls:', vals);
     }
 
     var g = function (tx, rs) {
-      if (DB_DEBUG) { db_log ('res:', rs); }                  //  !!!!
+      if (db.DEBUG) { db.log ('res:', rs); }                  //  !!!!
 
       var len = rs.rows.length;
 
@@ -147,16 +157,16 @@ function _db_query (table, fields, f, f_error, where) {       //  {{{1
 
 
 //
-//  :: _db_insert (table, fields, records[, f, f_error])(tx) -> none
+//  :: _insert (table, fields, records[, f, f_error])(tx) -> none
 //
-//  Depends     : DB_DEBUG -> db_log; db_error_cb.
+//  Depends     : DEBUG -> log; error_cb.
 //  Description : inserts into DB.
 //
 
-function _db_insert (table, fields, records, f, f_error) {    //  {{{1
-  _chk_args (arguments, 3, 5);
+db._insert = function (table, fields, records, f, f_error) {  //  {{{1
+  tools.chk_args (arguments, 3, 5);
 
-  var f_err = f_error || db_error_cb;
+  var f_err = f_error || db.error_cb;
   var n     = records.length;
 
   return function (tx) {
@@ -173,17 +183,17 @@ function _db_insert (table, fields, records, f, f_error) {    //  {{{1
               + ' ( id, ' + fields.join (', ')
               + ' ) VALUES ( ' + fid + ', ' + qms + ' )';
 
-      if (DB_DEBUG) {                                         //  !!!!
-        db_log ('sql:', sql);
-        db_log ('vls:', vals);
-        db_log ('rec:', records[i]);
+      if (db.DEBUG) {                                         //  !!!!
+        db.log ('sql:', sql);
+        db.log ('vls:', vals);
+        db.log ('rec:', records[i]);
       }
 
       tx.executeSql (                                         //  !!!!
         sql,
         vals,
         function (tx, rs) {
-          if (DB_DEBUG) { db_log ('res:', rs); }              //  !!!!
+          if (db.DEBUG) { db.log ('res:', rs); }              //  !!!!
 
           ids.push (rs.insertId);                             //  !!!!
 
@@ -199,17 +209,17 @@ function _db_insert (table, fields, records, f, f_error) {    //  {{{1
 
 
 //
-//  :: _db_update (table, fields, records[, f_error, where_key])(tx)
+//  :: _update (table, fields, records[, f_error, where_key])(tx)
 //      -> none
 //
-//  Depends     : DB_DEBUG -> db_log; db_error_cb.
+//  Depends     : DEBUG -> log; error_cb.
 //  Description : updates DB.
 //
 
-function _db_update (table, fields, records, f_error, wk) {   //  {{{1
-  _chk_args (arguments, 3, 5);
+db._update = function (table, fields, records, f_error, wk) { //  {{{1
+  tools.chk_args (arguments, 3, 5);
 
-  var f_err = f_error || db_error_cb;
+  var f_err = f_error || db.error_cb;
   var wk_   = wk == none ? '_W_' : wk;
 
   return function (tx) {
@@ -229,16 +239,20 @@ function _db_update (table, fields, records, f_error, wk) {   //  {{{1
       var sql = 'UPDATE ' + table + ' SET ' + flds
               + ' WHERE ' + records[i][wk_].expr.trim ();
 
-      if (DB_DEBUG) {                                         //  !!!!
-        db_log ('sql:', sql);
-        db_log ('vls:', vals);
-        db_log ('rec:', records[i]);
+      if (db.DEBUG) {                                         //  !!!!
+        db.log ('sql:', sql);
+        db.log ('vls:', vals);
+        db.log ('rec:', records[i]);
       }
 
       tx.executeSql (sql, vals, none, f_err);                 //  !!!!
     }
   };
 }                                                             //  }}}1
+
+//  --
+
+})(this);
 
 //  --
 

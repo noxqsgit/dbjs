@@ -14,7 +14,7 @@
 //
 //  --                                                            }}}1
 
-this.dbjs = this.dbjs || { DEBUG: true };
+this.dbjs.DEBUG = true;
 
 //  --
 
@@ -22,8 +22,8 @@ this.dbjs = this.dbjs || { DEBUG: true };
 
 //  --
 
-var db      = _this.dbjs;
-var DB      = {};
+var db  = _this.dbjs;
+var DB  = {};
 
 //  --
 

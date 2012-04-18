@@ -92,7 +92,7 @@ dbjs.do (dbName, dbDef, function (dbo) { return [
 
   // delete records w/ optional callback for # affected rows
   dbo.dFoo (
-    function (aff) { console.log ('aff=', aff); }),
+    function (aff) { console.log ('aff=', aff); },
     none, dbjs.gt ('id', 10)
   ),
 

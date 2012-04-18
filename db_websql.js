@@ -206,20 +206,24 @@ db._insert = function (table, fields, records, f, f_error) {  //  {{{1
 
 
 //
-//  :: _update (table, fields, records[, f_error, where_key])(tx)
+//  :: _update (table, fields, records[, f, f_error, where_key])(tx)
 //      -> none
 //
 //  Depends     : DEBUG -> log; error_cb.
 //  Description : updates DB.
 //
 
-db._update = function (table, fields, records, f_error, wk) { //  {{{1
-  tools.chk_args (arguments, 3, 5);
+db._update = function ( table, fields, records, f, f_error,   //  {{{1
+                        wk ) { 
+  tools.chk_args (arguments, 3, 6);
 
   var f_err = f_error || db.error_cb;
   var wk_   = wk == none ? '_W_' : wk;
+  var n     = records.length;
 
   return function (tx) {
+    var aff = [];
+
     for (var i in records) {
       var fs      = fields.filter (
         function (x) { return records[i][x] != none; }
@@ -242,7 +246,17 @@ db._update = function (table, fields, records, f_error, wk) { //  {{{1
         db.log ('rec:', records[i]);
       }
 
-      tx.executeSql (sql, vals, none, f_err);                 //  !!!!
+      var g = function (tx, rs) {
+        if (db.DEBUG) { db.log ('res:', rs); }                //  !!!!
+
+        aff.push (rs.rowsAffected);                           //  !!!!
+
+        // NB: must call f here to prevent async problems!
+
+        if (f && aff.length == n) { f (aff); }                //  !!!!
+      };
+
+      tx.executeSql (sql, vals, g, f_err);                    //  !!!!
     }
   };
 }                                                             //  }}}1
@@ -273,7 +287,9 @@ db._delete = function (table, f, f_error, where) {            //  {{{1
     var g = function (tx, rs) {
       if (db.DEBUG) { db.log ('res:', rs); }                  //  !!!!
 
-      // ...
+      // NB: must call f here to prevent async problems!
+
+      if (f) { f (rs.rowsAffected); }                         //  !!!!
     };
 
     tx.executeSql (sql, vals, g, f_err);                      //  !!!!

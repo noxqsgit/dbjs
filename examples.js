@@ -7,7 +7,7 @@
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
 //
-//  Description : Overview of current (...) features.
+//  Description : Overview of current (97ef210) features.
 //
 //  --                                                            }}}1
 

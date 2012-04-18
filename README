@@ -15,7 +15,7 @@ Version     : v0.1.0-dev
 
   ...
 
-  See examples.html for an annotated example of the current
+  See examples.{html,js} for an annotated example of the current
   implementation.
                                                                   }}}1
 

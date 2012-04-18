@@ -214,7 +214,7 @@ db._insert = function (table, fields, records, f, f_error) {  //  {{{1
 //
 
 db._update = function ( table, fields, records, f, f_error,   //  {{{1
-                        wk ) { 
+                        wk ) {
   tools.chk_args (arguments, 3, 6);
 
   var f_err = f_error || db.error_cb;

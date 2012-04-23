@@ -2,12 +2,12 @@
 //
 //  File        : examples.js
 //  Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-//  Date        : 2012-04-18
+//  Date        : 2012-04-23
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
 //
-//  Description : Overview of current (97ef210) features.
+//  Description : Overview of current (dbf77ce) features.
 //
 //  --                                                            }}}1
 
@@ -24,9 +24,9 @@ var dbDef   = {                       // definition
 
 
 // perform database actions; in-order
-dbjs.do (dbName, dbDef, function (dbo) { return [
+dbjs.w (dbName, dbDef, function (dbo) { return [
 
-  //  Usage: dbjs.do (name, def[, f, f_error]) -> none
+  //  Usage: dbjs.w (name, def[, f, f_error]) -> none
   //
   //
   //  The database object (dbo) has functions for each table to
@@ -112,8 +112,8 @@ dbjs.do (dbName, dbDef, function (dbo) { return [
   // NB: you should probably set event handlers that use the database
   // here, after the initialisation.
 
-  // NB: you can nest dbjs.do calls w/out redefining:
-  // dbjs.do (dbName, none, ...);
+  // NB: you can nest dbjs.w calls w/out redefining:
+  // dbjs.w (dbName, none, ...);
 
 ]; });
 

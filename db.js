@@ -2,7 +2,7 @@
 //
 //  File        : db.js
 //  Maintainer  : Felix C. Stegerman <felixstegerman@noxqslabs.nl>
-//  Date        : 2012-04-18
+//  Date        : 2012-04-23
 //
 //  Copyright   : Copyright (C) 2012  Felix C. Stegerman
 //  Licence     : GPLv2 or EPLv1
@@ -216,13 +216,13 @@ db._defns = function (dbo) {                                  //  {{{1
 //  --
 
 //
-//  :: do (name, def[, f, f_error]) -> none
+//  :: w (name, def[, f, f_error]) -> none
 //
 //  Depends     : DB, _seq, _create_table, _defns; error_cb.
 //  Description : defines database; runs functions.
 //
 
-db.do = function (name, def, f, f_error) {                    //  {{{1
+db.w = function (name, def, f, f_error) {                     //  {{{1
   tools.chk_args (arguments, 2, 4);
 
   var f_    = f       || function () { return []; };

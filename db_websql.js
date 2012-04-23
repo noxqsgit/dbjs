@@ -263,13 +263,13 @@ db._update = function ( table, fields, records, f, f_error,   //  {{{1
 
 
 //
-//  :: _delete (table, f[, f_error, where])(tx) -> none
+//  :: _delete (table, where[, f, f_error])(tx) -> none
 //
 //  Depends     : DEBUG -> log; error_cb.
 //  Description : deletes from DB.
 //
 
-db._delete = function (table, f, f_error, where) {            //  {{{1
+db._delete = function (table, where, f, f_error) {            //  {{{1
   tools.chk_args (arguments, 2, 4);
 
   var f_err = f_error || db.error_cb;

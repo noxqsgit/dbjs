@@ -40,7 +40,7 @@ dbjs.w (dbName, dbDef, function (dbo) { return [
   //    .qFoo (          f[, f_error, where]) (...) -> none
   //    .iFoo (records[, f , f_error])        (...) -> none
   //    .uFoo (records[, f , f_error])        (...) -> none
-  //    .dFoo (          f[, f_error, where]) (...) -> none
+  //    .dFoo (where  [, f , f_error])        (...) -> none
   //
   //  You can also dump/load the entire database:
   //    .dump (f[, f_error, f_dump])    (...) -> none
@@ -92,8 +92,7 @@ dbjs.w (dbName, dbDef, function (dbo) { return [
 
   // delete records w/ optional callback for # affected rows
   dbo.dFoo (
-    function (aff) { console.log ('aff=', aff); },
-    none, dbjs.gt ('id', 10)
+    dbjs.gt ('id', 10), function (aff) { console.log ('aff=', aff); }
   ),
 
 
